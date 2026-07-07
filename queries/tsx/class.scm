@@ -1,5 +1,5 @@
 ;; ============================================
-;; ОРИГИНАЛЬНЫЕ ПАТТЕРНЫ (из плагина)
+;; ОРИГИНАЛЬНЫЕ ПАТТЕРНЫ ДЛЯ JSX АТРИБУТОВ
 ;; ============================================
 
 (jsx_attribute
@@ -13,24 +13,76 @@
   ])
 
 ;; ============================================
-;; ДОБАВЛЕННЫЕ ПАТТЕРНЫ ДЛЯ CVA И ДРУГИХ ФУНКЦИЙ
+;; ПАТТЕРНЫ ДЛЯ CVA()
 ;; ============================================
 
-;; Для cva() с обычной строкой
+;; 1. Базовая строка cva()
 (call_expression
   function: (identifier) @_function_name
   (#eq? @_function_name "cva")
   arguments: (arguments
     (string (string_fragment) @tailwind)))
 
-;; Для cva() с шаблонным литералом
+;; 2. Шаблонный литерал в cva()
 (call_expression
   function: (identifier) @_function_name
   (#eq? @_function_name "cva")
   arguments: (arguments
     (template_string) @tailwind.inner))
 
-;; Для cn() (classnames)
+;; 3. Строки внутри объекта (variants)
+(call_expression
+  function: (identifier) @_function_name
+  (#eq? @_function_name "cva")
+  arguments: (arguments
+    (object
+      (pair
+        (property_identifier) @_key
+        (#eq? @_key "variants")
+        (object
+          (pair
+            (property_identifier) @_variant_name
+            (object
+              (pair
+                (property_identifier) @_value_name
+                (string (string_fragment) @tailwind)))))))))
+
+;; 4. Строки внутри defaultVariants
+(call_expression
+  function: (identifier) @_function_name
+  (#eq? @_function_name "cva")
+  arguments: (arguments
+    (object
+      (pair
+        (property_identifier) @_key
+        (#eq? @_key "defaultVariants")
+        (object
+          (pair
+            (property_identifier) @_variant_name
+            (string (string_fragment) @tailwind)))))))
+
+;; 5. Шаблонные литералы внутри вариантов
+(call_expression
+  function: (identifier) @_function_name
+  (#eq? @_function_name "cva")
+  arguments: (arguments
+    (object
+      (pair
+        (property_identifier) @_key
+        (#eq? @_key "variants")
+        (object
+          (pair
+            (property_identifier) @_variant_name
+            (object
+              (pair
+                (property_identifier) @_value_name
+                (template_string) @tailwind.inner))))))))
+
+;; ============================================
+;; ПАТТЕРНЫ ДЛЯ ДРУГИХ ФУНКЦИЙ
+;; ============================================
+
+;; Для cn()
 (call_expression
   function: (identifier) @_function_name
   (#eq? @_function_name "cn")
